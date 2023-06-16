@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.box {
+  position: relative;
+  width: 857px;
+  height: 441px;
+  overflow: hidden;
+}
+.box .imgbox {
+  display: flex;
+  height: 441px;
+  transition: all 0.5s linear;
+}
+.box label {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 2;
+}
+.box label div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: red;
+  display: none;
+}
+.box label:nth-of-type(1) {
+  margin-left: -90px;
+}
+.box label:nth-of-type(2) {
+  margin-left: -60px;
+}
+.box label:nth-of-type(3) {
+  margin-left: -30px;
+}
+.box label:nth-of-type(5) {
+  margin-left: 30px;
+}
+.box label:nth-of-type(6) {
+  margin-left: 60px;
+}
+.box label:nth-of-type(7) {
+  margin-left: 90px;
+}
+.box input {
+  display: none;
+}
+.box input:checked + label div {
+  display: block;
+}
+.box #one:checked ~ .imgbox {
+  transform: translate(0);
+}
+.box #two:checked ~ .imgbox {
+  transform: translate(-857px);
+}
+.box #three:checked ~ .imgbox {
+  transform: translate(calc(-857px*2));
+}
+.box #four:checked ~ .imgbox {
+  transform: translate(calc(-857px*3));
+}
+.box #five:checked ~ .imgbox {
+  transform: translate(calc(-857px*4));
+}
+.box #six:checked ~ .imgbox {
+  transform: translate(calc(-857px*5));
+}
+.box #seven:checked ~ .imgbox {
+  transform: translate(calc(-857px*6));
+}

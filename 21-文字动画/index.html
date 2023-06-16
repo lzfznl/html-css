@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+        ul,li{
+            list-style: none;
+        }
+        ul{
+            display: flex;
+            justify-content: center;
+            font-size: 100px;
+        }
+        li{
+            color: white;
+            font-family: 'Titan One';
+            margin: 0 10px;
+            text-shadow: 0 0 pink,
+                         0 0 skyblue;
+            /* 这是字体的描边第一个值是粗细,第二个值是颜色 */
+            -webkit-text-stroke: 3px #000;
+            /* 单词大写 */
+            text-transform: uppercase;
+            animation: mymove 2s ease-in-out calc(var(--i)*120ms) infinite;
+        }
+        @keyframes mymove{
+            0%,
+            100% {
+                 /* 让文字先向下走自身高度的50%,然后顺时针旋转4度 */
+	            transform: translate(0, 50%) rotate(4deg);
+                text-shadow: 0 0 #f3c623, 0 0 #f2aaaa;
+            }
+            33.33% {
+                text-shadow: 0 60px #f37121, 0 120px #f2aaaa;
+            }
+            50% {
+                text-shadow: 0 0 #8fc0a9, 0 0 #84a9ac;
+                /* 这个跟刚才写的刚好相反动画到一半向上走自身的一半,逆时针旋转4度 */
+                transform: translate(0, -50%) rotate(-4deg);
+            }
+            66.66% {
+                text-shadow: 0 -60px #d54062, 0 -120px #8fc0a9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li style="--i:1">s</li>
+        <li style="--i:2">p</li>
+        <li style="--i:3">c</li>
+        <li style="--i:4">a</li>
+        <li style="--i:5">i</li>
+        <li style="--i:6">l</li>
+        <li style="--i:7">,</li>
+        <li style="--i:8">s</li>
+        <li style="--i:9">u</li>
+        <li style="--i:10">n</li>
+        <li style="--i:11">d</li>
+        <li style="--i:12">a</li>
+        <li style="--i:13">y</li>
+    </ul>
+</body>
+</html>
