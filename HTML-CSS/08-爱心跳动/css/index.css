@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  perspective: 900PX;
+}
+.box {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background-color: crimson;
+  transform: rotateZ(45deg);
+  animation: mave 1s  infinite;
+}
+/* 使用after和before伪元素来制作圆形的两边 */
+.box::after,
+.box::before {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: crimson;
+  animation: mave 1s infinite;
+}
+.box::after {
+  transform: translateX(-49%);
+}
+.box::before {
+  transform: translateY(-49%);
+}
+@keyframes mave {
+  0% {
+    width: 200px;
+    height: 200px;
+  }
+  20% {
+    width: 230px;
+    height: 230px;
+    background-color: #ef3953;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+  }
+}

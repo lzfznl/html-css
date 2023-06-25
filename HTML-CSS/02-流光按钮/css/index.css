@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #000;
+}
+a {
+  position: relative;
+  width: 400px;
+  height: 100px;
+  border-radius: 50px;
+  background: linear-gradient(to right, #03a9f4, #f441a5, #ffeb3b, #09a8f4);
+  background-size: 400%;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 24px;
+  line-height: 100px;
+  text-align: center;
+  color: white;
+}
+a::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 100px;
+  top: -5px;
+  bottom: -5px;
+  left: -5px;
+  right: -5px;
+  border-radius: 50px;
+  /* 背景渐变色 */
+  background-image: linear-gradient(to right, #03a9f4, #f441a5, #ffeb3b, #09a8f4);
+  /* 背景渐变色大小 */
+  background-size: 400%;
+  /* 元素的位置 底层或者顶层  -值表示底层 + 值表示顶层 */
+  z-index: -1;
+  /* 设置模糊度 显示发光效果 */
+  filter: blur(20px);
+}
+a:hover {
+  animation: one 10s linear infinite;
+}
+a:hover::after {
+  animation: one 10s linear infinite;
+}
+@keyframes one {
+  100% {
+    background-position: -400% 0;
+  }
+}

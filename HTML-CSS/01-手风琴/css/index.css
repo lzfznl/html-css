@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+ul,
+li {
+  list-style: none;
+}
+.box {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, pink, skyblue);
+}
+.box .imgbox {
+  width: 1000px;
+  height: 320px;
+  overflow: hidden;
+  transition: all 0.3s linear;
+}
+.box .imgbox li {
+  float: left;
+  position: relative;
+  width: 200px;
+  height: 320px;
+  transition: all 0.5s linear;
+}
+.box .imgbox li img {
+  display: block;
+}
+.box .imgbox li p {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  transition: all 0.3s;
+}
+.box .imgbox:hover li {
+  width: 90px;
+}
+.box .imgbox li:hover {
+  width: 640px;
+}
+.box .imgbox li:hover p {
+  font-size: 20px;
+}
