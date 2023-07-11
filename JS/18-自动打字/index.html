@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+        }
+        .word{
+            font-size: 16px;
+            line-height: 16px;
+            color: white;
+            width: 47em;
+            height: 304px;
+        }
+    </style>
+</head>
+<body>
+    
+    <pre class="word">
+
+    </pre>
+    <img src="" alt="" id="img" style="display:none;">
+    <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+    <script>
+
+        !(function(){
+            // 数据
+            const strdata = [
+                '_ooOoo_',
+                'o8888888o',
+                '88" . "88',
+                '(| -_- |)',
+                'O\\  =  /O',
+                '____/"---"\\____',
+                " '  \\\\|     |//  ' ",
+                '/  \\\\|||  :  |||//  \\',
+                '/  _||||| _:_ |||||-  \\',
+                '|   | \\\\\\  -  /// |   |',
+                "| \\_|  ''\\---/''  |_/ |",
+                '\\   -\\__  `-`  __/-   /',
+                "___`   '  /-- --\\  `    ___",
+                '."" '+"'<  ` ___\\_<|>_/___ '  >'"+' "" ',
+                '| | :  `- \\` ;`\\ _ /`; `/ - ` : | |',
+                '\\  \\ `-    \\_ __\\ /__ _/    -` /  /',
+                '======`- ____`- ___\\_____/___ -`____ -`======',
+                '`=---=`',
+                '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',
+
+            ]
+            // console.log(strdata)
+            // 定时器
+            let timer = null
+            const word = document.querySelector('.word')
+            const w = +getComputedStyle(word).width.replace('px','') / 16
+            // console.log(w)
+            window.addEventListener('load',() => {
+                const empledata = strdata.map(ele => {
+                    const length = ele.length
+                    const getemple = (w - length) / 2
+                    // console.log(getnum(ele),length)
+                    let stremple = ''
+                    for(let i = 0; i < getemple; i++){
+                        stremple += ' '
+                    }
+                    return stremple
+                })
+                let num = 0
+                let count = 0
+                let str = empledata[count] 
+                timer = setInterval(() => {
+                    if(count === strdata.length) {
+                        clearInterval(timer)
+                        timer = null
+                        setTimeout(function(){
+                            set('./index02.html')
+                        },1500)
+                        return
+                    }
+                    str += strdata[count][num]
+                    // console.log(str)
+                    word.innerHTML = str
+                    num++
+                    if(num === strdata[count].length){
+                        count++
+                        num = 0
+                        str += '</br>' + empledata[count] 
+                    }
+                },20)
+            })
+            function allnum(arr,num){
+                if(num === 0) return arr[0].length
+                return arr[num].length + allnum(arr,num-1)
+            }
+            function getnum(arr){
+                return Array.from(arr).filter(ele => {
+                    return ele === '\\'
+                }).length
+                
+            }
+            function set(url) {
+                //要转换为图片的dom对象
+                const element = document.querySelector('body');
+                //要显示图片的img标签
+                const image = document.querySelector('#img');
+                //调用html2image方法
+                html2image(element, image);
+                
+                function html2image(element, image) {
+                    html2canvas(element).then(function (canvas) {
+                        const imageData = canvas.toDataURL(1);
+                        console.log(imageData)
+                        localStorage.setItem('fzImg',imageData)
+                        //此时图片已经可以显示了
+                        image.src = imageData;
+                        image.style.display = 'block'
+                        location.href = url
+                    });
+                }
+            }
+        })()
+        
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1{
+            text-align: center;
+        }
+        form button{
+            width: 40px;
+            height: 20px;
+        }
+        table{
+            border-collapse: collapse;
+            /* border: 1px solid black; */
+        }
+        th{
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #999;
+            background: skyblue;
+        }
+        td{
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>新增学员</h1>
+    <form action="#" class="">
+        姓名:<input type="text" name="uname">
+        年龄:<input type="text" name="age">
+        性别:<select name="greder" id="">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        薪资:<input type="text" name="money">
+        就业城市:<select name="city">
+                    <option value="北京">北京</option>
+                    <option value="深圳">深圳</option>
+                    <option value="上海">上海</option>
+                </select>
+        <button>录入</button>
+    </form>
+    <h1>就业榜</h1>
+    <table>
+        <thead>
+            <th>学号</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>性别</th>
+            <th>薪资</th>
+            <th>就业城市</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+            <!-- <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr> -->
+        </tbody>
+    </table>
+    <script>
+        //  获取元素
+        const uname = document.querySelector('form [name="uname"]')
+        const age = document.querySelector('form [name="age"]')
+        const greder = document.querySelector('form [name="greder"]')
+        const money = document.querySelector('form [name="money"]')
+        const city = document.querySelector('form [name="city"]')
+        const infos = document.querySelectorAll('form [name]')
+        const arr = JSON.parse(localStorage.getItem('data')) || []
+        // console.log(arr)
+        // console.log(JSON.parse(localStorage.getItem('data')) === [])
+        
+
+        // 设置监听事件
+        const info = document.querySelector('form')
+        info.addEventListener('submit',function(e){
+            // 阻止默认行为，不跳转
+            e.preventDefault()
+
+            //表单验证
+            // let flag = true
+            for(let i = 0; i<infos.length; i++){
+                if(infos[i].value === ''){
+                    // flag = false
+                    alert("不能为空！")
+                    return
+                }
+
+            }
+            // 创建对象
+            const obj = {
+                uId: arr.length > 0 ? arr[arr.length-1].uId + 1 : 1,
+                uname: uname.value,
+                age: age.value,
+                greder: greder.value,
+                money: money.value,
+                city: city.value,
+            }
+            arr.push(obj)
+            localStorage.setItem('data',JSON.stringify(arr))
+            render(arr)
+            info.reset()
+        })
+
+
+        //渲染
+        const tbody = document.querySelector('table tbody')
+        function render(obj){
+            // 创建对象
+            tbody.innerHTML=''
+            // for(let i = 0; i < arr.length; i++){
+            //     const tr = document.createElement('tr')
+            //     tr.innerHTML = `
+            //     <th>${arr[i].uId}</th>
+            //     <th>${arr[i].uname}</th>
+            //     <th>${arr[i].age}</th>
+            //     <th>${arr[i].greder}</th>
+            //     <th>${arr[i].money}</th>
+            //     <th>${arr[i].city}</th>
+            //     <th><a href="#" data-id='${i}'>删除</a></th>
+            // `
+            //     tbody.appendChild(tr)
+            // }
+
+            // 利用map遍历数组，返回对应tr的数组
+            const trArr = arr.map(function(ele,index){
+                return `
+                <tr>
+                    <td>${ele.uId}</td>
+                    <td>${ele.uname}</td>
+                    <td>${ele.age}</td>
+                    <td>${ele.greder}</td>
+                    <td>${ele.money}</td>
+                    <td>${ele.city}</td>
+                    <td><a href="#" data-id='${index}'>删除</a></td>
+                </tr>
+                `
+            })
+            // console.log(trArr)
+            tbody.innerHTML= trArr.join('')
+        }
+        render(arr)
+
+        // 删除
+        let table = document.querySelector("table")
+        table.addEventListener('click',function(e){
+            if(e.target.tagName === 'A'){
+                arr.splice(e.target.dataset.id,1)
+                console.log(arr)
+            }
+            localStorage.setItem('data',JSON.stringify(arr))
+            render(arr)
+        })
+    </script>
+</body>
+</html>

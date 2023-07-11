@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box{
+            position: relative;
+            width: 600px;
+            height: 600px;
+            border: 1px solid #000;
+        }
+        .foods{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+        .one{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: red;
+        }
+        .two{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: blue;
+        }
+        .three{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: pink;
+        }
+        .herobox{
+            position: relative;
+        }
+        .hero{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: black;
+        }
+
+        .enemybox{
+            position: relative;
+        }
+        .enemy{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: greenyellow;
+        }
+        
+        .alert{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 200px;
+            height: 100px;
+            border: 1px solid #000;
+            z-index: 20;
+            background: skyblue;
+        }
+        .alert .close{
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 16px;
+            background: red;
+            cursor: pointer;
+        }
+        .count{
+            position: absolute;
+            top:-30px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 100%;
+            height: 30px;
+            line-height: 30px;
+            font-size: 18px;
+            text-align: center;
+        }
+        .count span{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="count">您的得分: <span>0</span> (红色1分，蓝色2分，粉色3分)</div>
+        <div class="herobox"></div>
+        <div class="enemybox"></div>
+        <div class="foods"></div>
+    </div>
+    <script>
+        !function(){
+            const box = document.querySelector('.box')
+            const herobox = box.querySelector('.herobox')
+            const enemybox = box.querySelector('.enemybox')
+            const scorecount = box.querySelector('.count span')
+            const foods = box.querySelector('.foods')
+            // 食物地图信息
+            const map = []
+            // 速度
+            const speed = 6 
+            // 速度倍率
+            let times = 1
+            // 速度定时器
+            let speedtimer = null
+
+            // 类名信息
+            const source = ['one','two','three']
+            // 密度
+            const n = 16
+            // 敌人
+            const enemy = {
+                id : 1,
+                length: 4,
+                first_x:0,
+                first_y:0,
+                head:undefined,
+                // 左，上，右，下
+                dirt:[false,false,false,false],
+                bodys:[]
+            }
+
+            // 敌人定时器
+            let timer = null
+            // 敌人方向定时器
+            let dirtimer = null
+
+            // 玩家初始信息
+            const hero = {
+                id : 0,
+                length: 1,
+                first_x: 300,
+                first_y: 300,
+                head:{},
+                // 左，上，右，下
+                dirt:[false,false,false,false],
+                bodys:[]
+            }
+            // 玩家移动定时器
+            let herotimer = null
+            // 计分器
+            let count = 0
+            // 存活
+            let herolife = 1
+
+            // 初始化函数
+            function  initialize(){
+                herolife = 1
+                scorecount.innerHTML = '0'
+                foods.innerHTML = ``
+                for(let i = 0; i < n; i++){        
+                    const food = document.createElement('div')
+                    const score = myRandom(0,2)
+                    const x =  myRandom(0,594)
+                    const y =  myRandom(0,594)
+                    food.style.left = x + 'px'
+                    food.style.top = y + 'px'
+                    food.className = source[score]
+                    food.dataset.id = i
+                    foods.append(food)
+                    // 创建食物对象
+                    map[i] = {
+                        id: i,
+                        x: x,
+                        y: y,
+                        info:food
+                    }
+                    // console.log(map)
+                }
+                // 延时生成敌人
+                enemybox.innerHTML = ``
+                setTimeout(() => {
+                    enemy.length = 4
+                    enemy.first_x = 0
+                    enemy.first_y = 0
+                    enemy.head = undefined
+                    enemy.dirt = [false,false,false,false]
+                    enemy.bodys = []
+                    const firstDir = myRandom(0,3)
+                    enemy.dirt[firstDir] = true 
+                    // 初始出现的位置
+                    const first = myRandom(0,594)
+                    if(firstDir % 2 === 1) {
+                        enemy.first_x = first
+                        if(firstDir === 1){
+                            enemy.first_y = 594
+                        }else{
+                            enemy.first_y = 0
+                        }
+                    }
+                    if(firstDir % 2 === 0) {
+                        enemy.first_y = first
+                        if(firstDir === 0){
+                            enemy.first_x = 594
+                        }else{
+                            enemy.first_x = 0
+                        }
+                    }
+                    const enemyhead = document.createElement('div')
+                    enemyhead.style.left = enemy.first_x + 'px'
+                    enemyhead.style.top = enemy.first_y + 'px'
+                    enemyhead.className = 'enemy'
+                    enemybox.append(enemyhead)
+                    enemy.head = enemyhead
+
+                    // 获取身体的坐标
+                    for(let i = 1; i<enemy.length; i++){
+                        const body = document.createElement('div')
+                        body.style.left = enemy.first_x + 'px'
+                        body.style.top = enemy.first_y + 'px'   
+                        body.className = 'enemy'
+                        enemybox.append(body)
+                        enemy.bodys.push(body)
+                    }
+                    // 敌人定时移动
+                    timer = setInterval(function(){
+                        move(enemy)
+                        if(!dirtimer){
+                            dirtimer = setTimeout(function(){
+                                while(true){
+                                    const changeDir = myRandom(0,3)
+                                    const reverseDir = (changeDir + 2) % 4
+                                    if(enemy.dirt[reverseDir] === true) continue
+                                    const olddir = enemy.dirt.indexOf(true) !== -1 && enemy.dirt.indexOf(true)
+                                    enemy.dirt[olddir] = false
+                                    enemy.dirt[changeDir] = true
+                                    break
+                                }
+                                dirtimer = null
+                            },20000)
+                        }
+                    },500)
+                    // speedtimer = setInterval(() => {
+                    //     times++
+                    // },30000)
+                },3000)
+                // 生成玩家
+                herobox.innerHTML = ``
+                hero.length = 1
+                hero.first_x = 300
+                hero.first_y = 300
+                hero.head = undefined
+                hero.dirt = [false,false,false,false]
+                hero.bodys = []
+                const herohead = document.createElement('div')
+                herohead.style.left = hero.first_x + 'px'
+                herohead.style.top = hero.first_y + 'px'
+                herohead.className = 'hero'
+                herobox.append(herohead)
+                hero.head = herohead
+            }
+            //加载完成执行初始化函数   
+            window.addEventListener('load',function(){
+                initialize()
+            })
+
+            // 用户控制hero移动
+            window.addEventListener('keydown',e => {
+                if(herolife <= 0) return
+                // 兼容处理
+                const ele = e || window.event
+                const keyCode = e.keyCode || e.which
+                // console.log(hero.dirt)
+                // 按左
+                let dir = null
+                if(keyCode === 37){
+                    dir = 0
+                }
+                if(keyCode === 38){
+                    dir = 1
+                }
+                if(keyCode === 39){
+                    dir = 2
+                }
+                if(keyCode === 40){
+                    dir = 3
+                }
+                if(!herotimer){
+                    // console.log(1)
+                    herotimer = setTimeout(function(){
+                        herotimer = null
+                        const reversedir = (dir+2) % 4
+                        if(hero.dirt[reversedir] === true) return
+                        const olddir = hero.dirt.indexOf(true) !== -1 ? hero.dirt.indexOf(true) : 0
+                        hero.dirt[olddir] = false
+                        if(dir !== null) hero.dirt[dir] = true
+                        move(hero)
+                    },60)
+                }
+            })
+
+            // 移动
+            function move(target){
+                if(target.dirt.indexOf(true) === -1) return
+                const dir = target.dirt.indexOf(true)
+                // 处理身体移动
+                for(let i = target.length - 2; i > 0; i--){
+                    target.bodys[i].style.left = target.bodys[i-1].style.left
+                    target.bodys[i].style.top = target.bodys[i-1].style.top
+                }
+                if(target.length > 1){                  
+                    target.bodys[0].style.left = target.head.style.left
+                    target.bodys[0].style.top = target.head.style.top
+                }
+                if(target.id === 1){
+                    Ehitwall(target)
+                }
+                // 左
+                if(dir === 0){
+                    if(target.first_x - speed*times < 0) {
+                        target.first_x = 0
+                    }else{
+                        target.first_x -= speed*times
+                    }
+                }
+                // 上
+                if(dir === 1){
+                    if(target.first_y - speed*times < 0) {
+                        target.first_y = 0
+                    }else{
+                        target.first_y -= speed*times    
+                    }
+                }
+                // 右
+                if(dir === 2){
+                    if(target.first_x + speed*times > 594){
+                        target.first_x = 594
+                    }else{
+                        target.first_x += speed*times 
+                    }
+                }
+                // 下
+                if(dir === 3){
+                    if(target.first_y + speed*times > 594) {
+                        target.first_y = 594
+                    }else{
+                        target.first_y += speed*times 
+                    }
+                }
+                target.head.style.left =  target.first_x + 'px'
+                target.head.style.top =  target.first_y + 'px'
+                eat(target.head,target.id)
+                hit(target)
+            }
+
+            // 敌人撞墙改变自己的方向
+            function Ehitwall(target){
+                // 方向
+                const olddir = target.dirt.indexOf(true) !== -1 ? target.dirt.indexOf(true) : 0
+                if(olddir === 0){
+                    if(target.first_x > 0) return
+                }
+                if(olddir === 1){
+                    if(target.first_y > 0) return
+                }
+                if(olddir === 2){
+                    if(target.first_x < 594) return
+                }
+                if(olddir === 3){
+                    if(target.first_y < 594) return
+                }
+                // 设定规则 从左到右，从上到下依次找可走的路
+                let dir = optional(target,olddir)
+                target.dirt[olddir] = false
+                target.dirt[dir] = true
+                console.log(target.dirt)
+            }
+            
+            // 判断可走方向
+            function optional(target,dir){
+                if(dir % 2 === 0){
+                    if(target.first_y > 0){
+                        return 1
+                    }
+                    if(target.first_y < 594){
+                        return 3
+                    }
+                }
+                if(dir % 2 === 1){
+                    if(target.first_x > 0){
+                        return 0
+                    }
+                    if(target.first_y < 594){
+                        return 2
+                    }
+                }
+            }
+
+            // 吃东西
+            function eat(target,id){
+                const x = +getComputedStyle(target).left.replace('px','')
+                const y = +getComputedStyle(target).top.replace('px','')
+                for(let i = 0; i < map.length; i++){
+                    if(map[i].y > y - 6 && map[i].y < y + 6 && map[i].x > x - 6 && map[i].x < x + 6){
+                        console.log(map[i].info.className)
+                        if(map[i].info.className === 'one')  count+=1
+                        if(map[i].info.className === 'two')  count+=2
+                        if(map[i].info.className === 'three')  count+=3
+                        scorecount.innerHTML = `${count}`
+                        // 如果是玩家
+                        if(id === 0){
+                            hero.length++
+                            // 获取身体的坐标
+                            const dir = hero.dirt.indexOf(true) !== -1 && hero.dirt.indexOf(true)
+                            const body = document.createElement('div')
+                            if(length < 1){
+                                if(dir === 0){
+                                    body.style.left = hero.first_x + speed*times + 'px'
+                                    body.style.top = hero.first_y + 'px'   
+                                }
+                                if(dir === 1){
+                                    body.style.left = hero.first_x + 'px'
+                                    body.style.top = hero.first_y + speed*times + 'px'   
+                                }
+                                if(dir === 2){
+                                    body.style.left = hero.first_x - speed*times + 'px'
+                                    body.style.top = hero.first_y + 'px'   
+                                }
+                                if(dir === 3){
+                                    body.style.left = hero.first_x + 'px'
+                                    body.style.top = hero.first_y - speed*times + 'px'   
+                                }
+                            }else{
+                                if(dir === 0){
+                                    body.style.left = +getComputedStyle(hero.bodys[length-1]).left.replace('px','') + speed*times + 'px'
+                                    body.style.top = +getComputedStyle(hero.bodys[length-1]).top.replace('px','') + 'px'   
+                                }
+                                if(dir === 1){
+                                    body.style.left = +getComputedStyle(hero.bodys[length-1]).left.replace('px','') + 'px'
+                                    body.style.top = +getComputedStyle(hero.bodys[length-1]).top.replace('px','') + speed*times + 'px'   
+                                }
+                                if(dir === 2){
+                                    body.style.left = +getComputedStyle(hero.bodys[length-1]).left.replace('px','') - speed*times + 'px'
+                                    body.style.top = +getComputedStyle(hero.bodys[length-1]).top.replace('px','') + 'px'   
+                                }
+                                if(dir === 3){
+                                    body.style.left = +getComputedStyle(hero.bodys[length-1]).left.replace('px','') + 'px'
+                                    body.style.top = +getComputedStyle(hero.bodys[length-1]).top.replace('px','') - speed*times + 'px'   
+                                }
+                            }
+                            body.className = 'hero'
+                            herobox.append(body)
+                            hero.bodys.push(body)
+                        }
+                        // 如果是敌人
+                        if(id === 1){
+                            enemy.length++
+                            // 获取身体的坐标
+                            const dir = enemy.dirt.indexOf(true) !== -1 && enemy.dirt.indexOf(true)
+                            const body = document.createElement('div')
+                            if(length < 1){
+                                if(dir === 0){
+                                    body.style.left = enemy.first_x + speed*times + 'px'
+                                    body.style.top = enemy.first_y + 'px'   
+                                }
+                                if(dir === 1){
+                                    body.style.left = enemy.first_x + 'px'
+                                    body.style.top = enemy.first_y + speed*times + 'px'   
+                                }
+                                if(dir === 2){
+                                    body.style.left = enemy.first_x - speed*times + 'px'
+                                    body.style.top = enemy.first_y + 'px'   
+                                }
+                                if(dir === 3){
+                                    body.style.left = enemy.first_x + 'px'
+                                    body.style.top = enemy.first_y - speed*times + 'px'   
+                                }
+                            }else{
+                                if(dir === 0){
+                                    body.style.left = +getComputedStyle(enemy.bodys[length-1]).left.replace('px','') + speed*times + 'px'
+                                    body.style.top = +getComputedStyle(enemy.bodys[length-1]).top.replace('px','') + 'px'   
+                                }
+                                if(dir === 1){
+                                    body.style.left = +getComputedStyle(enemy.bodys[length-1]).left.replace('px','') + 'px'
+                                    body.style.top = +getComputedStyle(enemy.bodys[length-1]).top.replace('px','') + speed*times + 'px'   
+                                }
+                                if(dir === 2){
+                                    body.style.left = +getComputedStyle(enemy.bodys[length-1]).left.replace('px','') - speed*times + 'px'
+                                    body.style.top = +getComputedStyle(enemy.bodys[length-1]).top.replace('px','') + 'px'   
+                                }
+                                if(dir === 3){
+                                    body.style.left = +getComputedStyle(enemy.bodys[length-1]).left.replace('px','') + 'px'
+                                    body.style.top = +getComputedStyle(enemy.bodys[length-1]).top.replace('px','') - speed*times + 'px'   
+                                }
+                            }
+                            body.className = 'enemy'
+                            enemybox.append(body)
+                            enemy.bodys.push(body)
+                        }                   
+                        deleteFood(i)
+                        setFood(i)
+                        return
+                    }
+                }
+            }
+
+            // 判断是否碰撞
+            function hit(target){
+                if(!enemy.head) return
+                let flag = false
+                const x = +getComputedStyle(target.head).left.replace('px','')
+                const y = +getComputedStyle(target.head).top.replace('px','')
+                if(target.id === 1){
+                    const herox = +getComputedStyle(hero.head).left.replace('px','')
+                    const heroy = +getComputedStyle(hero.head).top.replace('px','')
+                    if(herox - 6 < x && x < herox + 6 && heroy - 6 < y && y < heroy + 6 ){
+                        flag = true
+                    }
+                    if(hero.length > 1){
+                        for(let i = 0; i < hero.bodys.length; i++){
+                            const bodyx = +getComputedStyle(hero.bodys[i]).left.replace('px','')
+                            const bodyy = +getComputedStyle(hero.bodys[i]).top.replace('px','')
+                            if(bodyx - 6 < x && x < bodyx + 6 && bodyy - 6 < y && y < bodyy + 6 ){
+                                flag = true
+                            }
+                        }
+                    }
+                }else{
+                    const enemyx = +getComputedStyle(enemy.head).left.replace('px','')
+                    const enemyy = +getComputedStyle(enemy.head).top.replace('px','')
+                    if(enemyx - 6 < x && x < enemyx + 6 && enemyy - 6 < y && y < enemyy + 6 ){
+                        flag = true
+                    }
+                    if(enemy.length > 1){
+                        for(let i = 0; i < enemy.bodys.length; i++){
+                            const bodyx = +getComputedStyle(enemy.bodys[i]).left.replace('px','')
+                            const bodyy = +getComputedStyle(enemy.bodys[i]).top.replace('px','')
+                            if(bodyx - 6 < x && x < bodyx + 6 && bodyy - 6 < y && y < bodyy + 6 ){
+                                flag = true
+                            }
+                        }
+                    }
+                }
+                if(flag){
+                    clearInterval(timer)
+                    const myalert = document.createElement('div')
+                    myalert.classList.add('alert')
+                    myalert.innerHTML = `你lose`
+                    const close = document.createElement('div')
+                    close.classList.add('close')
+                    close.innerHTML = '×'
+                    close.addEventListener('click',e => {
+
+                        myalert.remove()
+                        initialize()
+                    })
+                    myalert.append(close)
+                    box.append(myalert)
+                    herolife--
+                }
+            }
+
+            // 销毁食物
+            function deleteFood(n){
+                setTimeout(function(){
+                    map[n].info.style.display = 'block'
+                },1500)
+            }
+
+            // 生成食物
+            function setFood(n){
+                setTimeout(function(){
+                },1500)
+                const score = myRandom(0,2)
+                const x =  myRandom(0,594)
+                const y =  myRandom(0,594)
+                map[n].info.style.left = x + 'px'
+                map[n].info.style.top = y + 'px'
+                map[n].info.className = source[score]
+                map[n].x = x
+                map[n].y = y
+                map[n].info.style.display = 'none'
+            }
+
+            // 随机函数
+            function myRandom(min,max){
+                return Math.floor(Math.random()*(max-min+1)+min)
+            }
+
+        }()
+    </script>
+</body>
+</html>

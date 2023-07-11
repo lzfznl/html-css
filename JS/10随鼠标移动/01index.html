@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .elf{
+            position: absolute;
+            width: 36px;
+            height: 60px;
+            background: url(./images/elf.png) no-repeat 0 center/cover;
+            animation: run .6s steps(7) infinite;
+        }
+
+        @keyframes run {
+            100%{
+                background-position-x: -252px;
+            }
+        }
+    </style>
+    <script src="./js/jquery.js"></script>
+</head>
+<body>
+    <div class="elf"></div>
+
+    <script>
+        $(function(){
+            // 获取元素
+            const elf = $('.elf')
+            $(document).on('mousemove',function(e){
+                // console.log(e.pageY,e.offsetY,e.clientY)
+                let x = e.pageX
+                let y = e.pageY
+                if(x >= 18 && x <= $(window).width() - 18){
+                    $(elf).css('left',x - 18 + 'px')
+                }
+                if(y >= 30 && y <= $(window).height() - 30){
+                    $(elf).css('top',y - 30 + 'px')
+                }
+            })
+        })
+    </script>
+</body>
+</html>

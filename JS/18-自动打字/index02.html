@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* background: skyblue; */
+            perspective: 1000px;
+            background-color: #222;
+        }
+        .bg{
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        .bg div{
+            flex-shrink: 0;
+            transition: all 0.3s linear;
+            opacity: 1;
+        }
+        .rotate{
+            animation: rotate 0.3s linear;
+            /* 元素背对屏幕不可见 */
+            backface-visibility: hidden;
+        }
+        .word {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            opacity: 0;
+            transform: translate(-50%,-50%);
+            font-size: 8em;
+            color: #333;
+            transition: all 1s linear;
+        }
+        .on{
+            opacity: 1;
+            /* transition: all 1s linear; */
+        }
+        .word::after {
+            content: "佛祖保佑       永无BUG";
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: transparent;
+            background-image: linear-gradient(to right, #c23616, #192a56, #00d2d3, yellow, #6d214f, #2e86de, #4cd137, #e84118);
+            /* 背景绘制区域，值为text时，给文字设置镂空效果，前提必须是文字颜色为透明色 */
+            background-clip: text;
+            /* 谷歌浏览器私有属性 */
+            -webkit-background-clip: text;
+            /* 使用裁切方法创建元素的可显示区域 circle表示裁切一个圆形 100px表示圆的直径 0%和50%表示圆心位置 直径和圆心两组值中间用at隔开*/
+            clip-path: circle(100px at 0% 50%);
+            -webkit-clip-path: circle(100px at 0% 50%);
+            animation: mymove 5s infinite;
+        }
+        @keyframes mymove {
+            0% {
+            clip-path: circle(100px at 0% 50%);
+            -webkit-clip-path: circle(100px at 0% 50%);
+            }
+            50% {
+            clip-path: circle(100px at 100% 50%);
+            -webkit-clip-path: circle(100px at 100% 50%);
+            }
+            100% {
+            clip-path: circle(100px at 0% 50%);
+            -webkit-clip-path: circle(100px at 0% 50%);
+            }
+        }
+        @keyframes rotate{
+            100%{
+                transform: rotateX(180deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="bg"></div>
+    <pre class="word">佛祖保佑       永无BUG</pre>
+    <script>
+        function getImgamine(type,imgUrl){
+            // const bg = document.createElement('div')
+            // bg.classList.add('bg')
+            // bg.style.width = document.documentElement.clientWidth + 'px'
+            // bg.style.height = document.documentElement.clientHeight + 'px'
+            const bg = document.querySelector(type)
+            let count = 0
+            const datalist = []
+            // console.log(bg.style.width,getComputedStyle(bg).width)
+            const w =  getComputedStyle(bg).width.replace('px','') / 10
+            const h =  getComputedStyle(bg).height.replace('px','') / 6
+            console.log(w,h)
+            for(let i = 0; i < 6; i++){
+                for(let j = 0; j < 10; j++){
+                    const div = document.createElement('div')
+                    div.dataset.id = i*10 + j + 1
+                    div.style.width = w + 'px'
+                    div.style.height = h + 'px'
+                    div.style.background = `url(${imgUrl})`
+                    div.style.backgroundSize = `${w*10}px ${h*6}px`
+                    div.style.backgroundPositionX = -w*j+'px'
+                    div.style.backgroundPositionY = -h*i+'px'
+                    // console.log( div.style.backgroundPosition )
+                    bg.append(div)
+                    count++
+                    datalist.push(div)
+                }
+            }
+            document.body.append(bg)
+            //  25 26
+            //  35 36
+            // const data = [[2,5],[2,6],[3,5],[3,6]]
+            // 图片消失
+            let n = 1
+            let timer = setInterval(function(){
+                if(count === 0){
+                    bg.remove()
+                    localStorage.removeItem('fzImg')
+                    document.querySelector('.word').classList.add('on')
+                    return clearInterval(timer)
+                }
+                for(let x = 0; x < n; x++){
+                    let num = random(datalist.length)
+                    datalist[num].style.opacity = 0
+                    datalist[num].classList.add('rotate')
+                    // datalist[num].style.transform = 'rotateX(180deg)'
+                    datalist.splice(num,1)
+                    console.log(datalist)
+                    count--
+                }
+                
+            },100)
+            // 随机函数
+            function random(max){
+                return Math.floor(Math.random()*(max))
+            }
+        }
+        const imgUrl = localStorage.getItem('fzImg')
+        if(imgUrl){
+            getImgamine('.bg',imgUrl)
+        }else{
+            setTimeout(()=>{
+                document.querySelector('.word').classList.add('on')
+            },500)
+        }
+        
+    </script>
+</body>
+</html>

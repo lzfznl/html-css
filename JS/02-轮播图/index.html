@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+        .box{
+            position: relative;
+            background: #fff;
+            width: 600px;
+            height: 300px;
+            overflow: hidden;
+        }
+        .box img{
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .box .bottom{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: rgba(0,0,0,0.3);
+            color: red;
+        }
+        .box .bottom ul{
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+        .box .bottom li{
+            position: relative;
+            list-style: none;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            margin: 0 5px;
+            border-radius: 50%;
+        }
+        .box .bottom li.active::after{
+            content: "";
+            position: absolute;
+            top:50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: skyblue;
+        }
+        button{
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 20px;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: 0;
+        }
+        button.left{
+            left:20px;
+        }
+        button.right{
+            right:20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="./images/1.jpg" alt="">
+        <div class="bottom">
+            <p>one</p>
+            <ul>
+                <li class="active" data-id="0"></li>
+                <li data-id="1"></li>
+                <li data-id="2"></li>
+                <li data-id="3"></li>
+                <li data-id="4"></li>
+            </ul>
+        </div>
+        <button class="left">&lt;</button>
+        <button class="right">&gt;</button>
+    </div>
+
+    <script>
+        const data=[
+            {url:"./images/1.jpg",info:"one",color:"red"},
+            {url:"./images/2.jpg",info:"two",color:"pink"},
+            {url:"./images/3.jpg",info:"three",color:"blue"},
+            {url:"./images/4.jpg",info:"four",color:"greenyellow"},
+            {url:"./images/5.jpg",info:"five",color:"yellow"}
+        ]
+
+        const box = document.querySelector(".box")
+        console.log(box)
+        let i = 0
+        const img = box.querySelector('img')
+        const info = box.querySelector(".bottom p")
+
+        // 按钮事件
+        const left = box.querySelector('.left')
+        const right = box.querySelector('.right')
+
+        left.addEventListener('click',function(){
+            if(i <= 0){
+                i = 4
+            }else{
+                i--
+            }
+            img.src = data[i].url
+            info.innerHTML = data[i].info
+            info.style.color = data[i].color
+            box.querySelector('.bottom .active').classList.remove('active')
+            box.querySelector(`.bottom li:nth-child(${i+1})`).classList.add('active')
+        })
+        right.addEventListener('click',function(){
+            if(i >= 4){
+                i = 0
+            }else{
+                i++
+            }
+            img.src = data[i].url
+            info.innerHTML = data[i].info
+            info.style.color = data[i].color
+            box.querySelector('.bottom .active').classList.remove('active')
+            box.querySelector(`.bottom li:nth-child(${i+1})`).classList.add('active')
+        })
+
+        // 定时器自动播放
+        let times = setInterval(function(){
+            right.click()
+        },1000)
+        // 点击小圈切换
+        // 通过冒泡机制，事件委托
+        const btns = box.querySelector('.bottom')
+        btns.addEventListener('click',function(e){
+            // console.log(e)
+            // 打印对象属性
+            // console.dir(e.target)
+            // 只有点击的是li才进行操作
+            // console.log([...this.querySelectorAll('li')].indexOf(e.target)); // 转换数组同样可以使用Array.from()
+            if(e.target.tagName === 'LI'){
+                this.querySelector('.active').classList.remove('active')
+                e.target.classList.add('active')
+                // 获取点击的li的下标
+                // 方法1
+                // let k = Array.from(this.querySelectorAll('li')).indexOf(e.target)
+                // let k = [...this.querySelectorAll('li')].indexOf(e.target)
+                //方法2 给每个li 一个自定义属性
+                let k = e.target.dataset.id
+                console.log(k)
+                img.src = data[k].url
+                info.innerHTML = data[k].info
+                info.style.color = data[k].color
+                i = k
+            }
+            
+        })
+        // 普通方法
+        // const btn = box.querySelectorAll(".bottom li")
+        // for(let k = 0 ;k < btn.length; k++){
+        //     btn[k].addEventListener("click",function(){
+        //         // alert("你好")
+        //         for(let j in btn){
+        //             btn[j].className = ''
+        //         }
+        //         this.classList.add('active')
+        //         img.src = data[k].url
+        //         info.innerHTML = data[k].info
+        //         info.style.color = data[k].color
+        //         i = k
+        //     })
+        // }
+
+        //鼠标经过关闭定时器
+        box.addEventListener('mouseenter',function(){
+            clearInterval(times)
+        })
+        //鼠标离开开启定时器
+        box.addEventListener('mouseleave',function(){
+            clearInterval(times)
+
+            times = setInterval(function(){
+            if(i >= 4){
+                i = 0
+            }else{
+                i++
+            }
+            img.src = data[i].url
+            info.innerHTML = data[i].info
+            info.style.color = data[i].color
+            box.querySelector('.bottom .active').classList.remove('active')
+            box.querySelector(`.bottom li:nth-child(${i+1})`).classList.add('active')
+        },1000)
+        })
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container{
+            position: relative;
+            width: 200px;
+            height: 30px;
+            background: white;
+            border: 1px solid #000;
+        }
+        .container .box{
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* width: 200px; */
+            height: 30px;
+            background: skyblue;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box"></div>
+    </div>
+
+
+    <script>
+        const div = document.querySelector('.container')
+        const box = document.querySelector('.container .box')
+        let timer = null
+        div.addEventListener('click',function(){
+            let count = 0
+            timer = setInterval(function(){
+                count++
+                if(count <= 200){
+                    box.style.width = count + 'px'
+                }else{
+                    clearInterval(timer)
+                }
+            },30)
+        })
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+        }
+
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        ul,li{
+            list-style: none;
+        }
+        .imgbox{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            width: 600px;
+            height: 440px;
+        }
+        .large{
+            position: absolute;
+            left: 460px;
+            top: 0;
+            width: 440px;
+            height: 440px;
+            display: none;
+            overflow: hidden;
+            /* background: pink; */
+            background: pink url(./images/img-1.jpg) no-repeat 0px 0px/1760px 1760px;
+        }
+        .large img{
+            width: 2200px;
+            height: 2200px;
+        }
+        .middle{
+            position: relative;
+            width: 440px;
+            height: 440px;
+        }
+        .middle img{
+            width: 440px;
+            height: 440px;
+        }
+        .middle .black{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 110px;
+            height: 110px;
+            background: rgba(0,0,0, .3);
+            display: none;
+        }
+        .small{
+            display: flex;
+            width: 100px;
+            height: 100%;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .small img{
+            width: 100px;
+            height: 100px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="imgbox">
+        <div class="large">
+            <!-- <img src="./images/img-1.jpg" alt=""> -->
+        </div>
+        <div class="middle">
+            <img src="./images/img-1.jpg" alt="" class="active">
+            <div class="black"></div>
+        </div>
+        <ul class="small">
+            <li><img src="./images/img-1.jpg" alt="" data-id="1"></li>
+            <li><img src="./images/img-2.jpg" alt="" data-id="2"></li>
+            <li><img src="./images/img-3.jpg" alt="" data-id="3"></li>
+            <li><img src="./images/img-4.jpg" alt="" data-id="4"></li>
+        </ul>
+    </div>
+
+    <script>
+        const large = document.querySelector('.large')
+        // const child = large.querySelector('img')
+        const middle = document.querySelector('.middle')
+        const small = document.querySelector('.small')
+        const black = document.querySelector('.middle .black')
+        
+        let timeId = 0
+        let timeId2 = 0
+        // 显示大图片
+        middle.addEventListener('mouseenter',function(e) {
+            const img = middle.querySelector('img')
+            
+            large.style.backgroundImage = `url(${img.getAttribute('src')})`
+            // child.src = img.src
+            large.style.display = 'block'
+            clearTimeout(timeId)
+            black.style.display = 'block'
+        })
+        middle.addEventListener('mouseleave',() => {
+            clearTimeout(timeId2)
+            timeId = setTimeout(() => large.style.display = 'none', 200)
+            black.style.display = 'none'
+        })
+
+        middle.addEventListener('mousemove',function(e){
+             // 显示遮盖层
+            // console.log(e.offsetX,e.offsetY)
+            console.log(middle.getBoundingClientRect())
+            let left = e.clientX - middle.getBoundingClientRect().left
+            let top = e.clientY - middle.getBoundingClientRect().top
+            if(left >= 55 && left <= 385){
+                black.style.left = +left - 55 + 'px'
+                large.style.backgroundPositionX = -(left - 55)*4 + 'px'
+                // child.style.marginLeft = -(left) * 4 + 'px'
+            }   
+            if( top >= 55 && top <= 385){
+                black.style.top = +top - 55 + 'px'
+                large.style.backgroundPositionY = -(top - 55) * 4 + 'px'
+                // child.style.margintop = -(top) * 4 + 'px'
+            }
+            if(top < 55){
+                black.style.top = 0
+                large.style.backgroundPositionY = 0 + 'px'
+            }
+            if(left < 55){
+                black.style.left = 0
+                large.style.backgroundPositionX = 0 + 'px'
+            }
+            if(top > 385){
+                black.style.top = 330 + 'px'
+                large.style.backgroundPositionY = -330 * 4 + 'px'
+            }
+            if(left > 385){
+                black.style.left = 330 + 'px'
+                large.style.backgroundPositionX = -330 * 4 + 'px'
+            }
+        })
+
+
+        // 显示中图片
+        small.addEventListener('click',function(e){
+            if(e.target.tagName === 'IMG'){
+                const img = middle.querySelector('img')
+                // console.log(e.target.dataset.id)
+                // middle.src = e.target.getAttribute('src')
+                img.src = `./images/img-${e.target.dataset.id}.jpg`
+            }
+        })
+
+
+    </script>
+</body>
+</html>

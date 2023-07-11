@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./aminejs/anime.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #000;
+        }
+        .container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 1400px;
+            height: 1000px;
+            /* background: #fff; */
+        }
+        .container .box{
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            /* background: #444; */
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5),
+                        -1px -1px 3px rgba(255,255,255,0.6);
+        }
+        .container.circle .box{
+            border-radius: 50%;
+        }
+        .container .box:nth-child(3n){
+            background: #444;
+        }
+        .container .box:nth-child(3n+1){
+            background: #fff;
+        }
+        .container .box:nth-child(3n+2){
+            background: #03a9f4;
+        }
+        button{
+            position: relative;
+            margin: 10px;
+            z-index: 1;
+            border: none;
+            background: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 15px 30px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="" onclick="grender();">Grender</button>
+        <button class="change" onclick="circle()">Circle | Square</button>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container')
+        for(let i = 0; i < 60; i++){
+            const boxs = document.createElement('div')
+            boxs.classList.add('box')
+            container.appendChild(boxs)
+        }
+        function grender(){
+            anime({
+                targets:'.box',
+                translateX: () => anime.random(-700,700),
+                translateY: () => anime.random(-500,500),
+                scale: () => anime.random(1,5)
+            })
+        }
+        function circle(){
+            // const change = document.querySelector('.change')
+            container.classList.toggle('circle')
+        }
+        grender()
+    </script>
+</body>
+</html>

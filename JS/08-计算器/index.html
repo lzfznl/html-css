@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        table{
+            border: 1px solid black;
+        }
+        td{
+            border: 1px solid black;
+            text-align: center;
+            height: 40px;
+            width: 80px;
+            font-size: 16px;
+            line-height: 40px;
+            cursor: pointer;
+        }
+        th{
+            border: 1px solid black;
+            height: 60px;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th colspan="4">0</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-id="6">1/x</td>
+                <td data-id="5">x<sup>2</sup></td>
+                <td data-id="7">开根</td>
+                <td data-id="1">/</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td data-id="2">*</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td data-id="3">-</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td data-id="4">+</td>
+            </tr>
+            <tr>
+                <td class="c">c</td>
+                <td>0</td>
+                <td>.</td>
+                <td class="result">=</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        const number = document.querySelector('tbody')
+        const input = document.querySelector('thead tr th')
+
+        const arr = []
+        
+        number.addEventListener('click',e => {
+            // console.log(e.target.className)
+            if(e.target.className === 'result'){
+                input.innerHTML = countResult(...arr)
+                arr.splice(0,arr.length)
+                arr.push(input.innerHTML)
+                // console.log(countResult(...arr))
+            }else if(e.target.className === 'c'){
+                input.innerHTML = 0
+                arr.splice(0,arr.length)
+            }else{
+                if(e.target.tagName === 'TD'){
+                    arr.push(e.target.innerText)
+                    input.innerText = arr.join('')
+                    // console.log(arr.join(''))
+                }
+            }
+        })
+
+        function countResult(){
+            const num = []
+            let a = 0
+            let b = 0
+            let symbol = ''
+            for(let i = 0 ; i < arguments.length; i++){
+                if(!isNaN(+arguments[i]) || arguments[i] === '.'){
+                    num.push(arguments[i])
+                }else{
+                    if(i === arguments.length - 1 || i === 0){
+                        input.innerText = 'error'
+                    }else{
+                        symbol = arguments[i]
+                        a = +num.join('')
+                        num.splice(0,num.length)
+                    }
+                }        
+            }
+            b = +num.join('')
+            // console.log(a,b)
+            switch(symbol){
+                case '+':
+                    // console.log(a+b)
+                    return a+b
+                case '/':
+                    return a/b
+                case '*':
+                    return a*b
+                case '-':
+                    return a-b
+                default:
+                    return 'error'
+            }
+        
+        }
+        
+    </script>
+
+
+</body>
+</html>

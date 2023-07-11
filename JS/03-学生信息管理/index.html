@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1{
+            text-align: center;
+        }
+        form button{
+            width: 40px;
+            height: 20px;
+        }
+        table{
+            border-collapse: collapse;
+            /* border: 1px solid black; */
+        }
+        td{
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #999;
+            background: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <h1>新增加学员</h1>
+    <form action="#">
+        姓名：<input type="text" data-name="name">
+        年龄：<input type="text" data-name="age">
+        性别：<select name="" id="" data-name="greder">
+                <option value="男" selected>男</option>
+                <option value="女">女</option>
+             </select>
+        薪资：<input type="text" data-name="money">
+        就业城市：<select name="" id="" data-name="city">
+                    <option value="北京" selected>北京</option>
+                    <option value="上海">上海</option>
+                    <option value="深圳">深圳</option>
+                </select>
+        <button>提交</button>
+    </form>
+    <h2>就业榜</h2>
+    <table>
+        <tr>
+            <td>学号</td>
+            <td>姓名</td>
+            <td>年龄</td>
+            <td>性别</td>
+            <td>薪资</td>
+            <td>就业城市</td>
+            <td>操作</td>
+        </tr>
+    </table>
+    <script>
+        const table = document.querySelector('table tbody')
+        const btn = document.querySelector('form button')
+        const info = []
+        let count = 1
+        btn.addEventListener('click',function(){
+            const children = btn.parentNode.children
+            let flag = true
+            for(let i = 0; i < children.length-1;i++){
+                if(children[i].value === ''){
+                    flag = false
+                    break
+                }
+            }
+            if(flag){
+                const tr = document.createElement('tr')
+                let child = table.appendChild(tr)
+                // console.log(children)
+                child.innerHTML = `<td>${count}</td>`
+                for(let j = 0; j < children.length-1;j++){
+                    const td = document.createElement('td')
+                    // console.log(children[j].value)
+                    td.innerHTML = `${children[j].value}`
+                    child.appendChild(td)
+                    td.innerHTML = `${children[j].value}`
+                    children[j].value = ''
+                }
+                count++
+            
+            }else{
+                alert("不能为空")
+            }
+        })
+    </script>
+</body>
+</html>

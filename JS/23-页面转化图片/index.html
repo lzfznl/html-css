@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, pink, skyblue);
+        }
+        .content img {
+            width: 202px;
+            height: 102px;
+            border-radius: 10px;
+           
+        }
+        .card {
+            width: 220px;
+            height: 200px;
+            border: 1px solid skyblue;
+            border-radius: 10px;
+            background-color: #ccc;
+            margin-bottom: 10px;
+            transition: all 1s linear;
+            /* transform-style: preserve-3d; */
+        }
+        /* .card:hover{
+            transform: rotateY(180deg);
+        } */
+        .card div {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 20px;
+        }
+        #img{
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <!-- 卡片部分 -->
+        <button>点击</button>
+        <div class="card">
+          <div class="card_head">
+            <p>姓名：</p>
+            <p>张三丰</p>
+          </div>
+          <div class="card_content">
+            <p>age：</p>
+            <p>22岁</p>
+          </div>
+          <div class="card_footer">
+            <p>技能：</p>
+            <p>打太极</p>
+          </div>
+        </div>
+        <!-- 要生成的图片的内容区域 -->
+        <div class="content"></div>
+        <img src="" alt="" id="img">
+    </div>
+    <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+    <script>
+        const btn = document.querySelector('button')
+        // 此处以 card 部分内容为例，假设我们要将 card 整个 div 的内容区域变为图片
+        // function generateImages(){
+        //     html2canvas(document.querySelector('.card')).then(canvas => {
+        //         const imgUrl = canvas.toDataURL('image/jpeg')
+        //         const image = document.createElement('img')
+        //         image.src = imgUrl
+        //         // 将生成的图片放到 类名为 content 的元素中
+        //         document.querySelector('.content').appendChild(image)
+        //         const a = document.createElement('a')
+        //         a.href = imgUrl
+        //         // a.download 后面的内容为自定义图片的名称
+        //         a.download = 'study_download'
+        //         a.click()
+        //     })
+        // }
+        // document.querySelector('button').addEventListener('click',generateImages)
+    
+        function set(url) {
+            //要转换为图片的dom对象
+            const element = document.querySelector('body');
+            //要显示图片的img标签
+            const image = document.querySelector('#img');
+            //调用html2image方法
+            html2image(element, image);
+ 
+            function html2image(element, image) {
+                html2canvas(element).then(function (canvas) {
+                    const imageData = canvas.toDataURL(1);
+                    localStorage.setItem('myImg',imageData)
+                    //此时图片已经可以显示了
+                    image.src = imageData;
+                    image.style.display = 'block'
+                    location.href = url
+                });
+            }
+        }
+        btn.addEventListener('click',function(){
+            setTimeout(function(){
+                set('./index02.html')
+            },1500)
+        })
+
+        function img(url){
+            const img = new Image()
+            img.src = url 
+            const w = document.documentElement.clientWidth
+            const h = document.documentElement.clientHeight
+        }
+
+    </script>
+</body>
+</html>

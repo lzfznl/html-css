@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+        .box{
+            position: relative;
+            background: #fff;
+            width: 600px;
+            height: 300px;
+            overflow: hidden;
+        }
+        .box img{
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .box .bottom{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+        }
+        .box .bottom ul{
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+        .box .bottom li{
+            position: relative;
+            list-style: none;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            margin: 0 5px;
+            border-radius: 50%;
+        }
+        .box .bottom li.active::after{
+            content: "";
+            position: absolute;
+            top:50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="./images/1.jpg" alt="">
+        <div class="bottom">
+            <p>one</p>
+            <ul>
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const data=[
+            {url:"./images/1.jpg",info:"one",color:"red"},
+            {url:"./images/2.jpg",info:"two",color:"pink"},
+            {url:"./images/3.jpg",info:"three",color:"blue"},
+            {url:"./images/4.jpg",info:"four",color:"greenyellow"},
+            {url:"./images/5.jpg",info:"five",color:"yellow"}
+        ]
+
+        const box = document.querySelector(".box")
+        console.log(box)
+        let i = 0
+        const times = setInterval(function(){
+            if(i >= 4){
+                i = 0
+            }else{
+                i++
+            }
+            const img = box.querySelector('img')
+            // console.log(img)
+            img.src = data[i].url
+            const info = box.querySelector(".bottom p")
+            info.innerHTML = data[i].info
+            info.style.color = data[i].color
+            // const btn = box.querySelectorAll(".bottom li")
+            // for(let j in btn){
+            //     btn[j].className = ''
+            // }
+            // btn[i].className = 'active'
+            box.querySelector('.bottom .active').classList.remove('active')
+            box.querySelector(`.bottom li:nth-child(${i+1})`).classList.add('active')
+        },1000)
+    </script>
+</body>
+</html>
