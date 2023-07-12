@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- <img src="./images/background.png" alt=""> -->
+    <script>
+        const bg = document.createElement('canvas')
+        const cl = document.createElement('canvas')
+        bg.width = cl.width = 480
+        bg.height = cl.height = 700
+        const bgpen = bg.getContext('2d')
+        const clpen = cl.getContext('2d')
+        ;(async () => {
+            // 加载图片
+            const heroImg = [[],[]]
+            let bombImg = void 0
+            let lifeImg = void 0
+            const enemy1Img = [[],[]]
+            const enemy2Img = [[],[]]
+            const enemy3Img = [[],[]]
+            let gameover = void 0
+            let bomb_supply = void 0
+            let bullet_supply = void 0
+            let bullet1Img = void 0
+            let bullet2Img = void 0
+            let bgimg = void 0
+            let again = void 0
+            function load(){
+                const herosrc = [['./images/me1.png','./images/me2.png'],['./images/me_destroy_1.png','./images/me_destroy_2.png','./images/me_destroy_3.png','./images/me_destroy_4.png']]
+                const enemy1 = [['./images/enemy1.png'],['./images/enemy1_down1.png','./images/enemy1_down2.png','./images/enemy1_down3.png','./images/enemy1_down4.png']]
+                const enemy2 = [['./images/enemy2.png'],['./images/enemy2_down1.png','./images/enemy2_down2.png','./images/enemy2_down3.png','./images/enemy2_down4.png']]
+                const enemy3 = [['./images/enemy3_n1.png'],['./images/enemy3_down1.png','./images/enemy3_down2.png','./images/enemy3_down3.png','./images/enemy3_down4.png','./images/enemy3_down5.png','./images/enemy3_down6.png']]
+                herosrc[0].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    heroImg[0].push(img)
+                })
+                herosrc[1].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    heroImg[1].push(img)
+                })
+                enemy1[0].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy1Img[0].push(img)
+                })
+                enemy1[1].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy1Img[1].push(img)
+                })
+                enemy2[0].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy2Img[0].push(img)
+                })
+                enemy2[1].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy2Img[1].push(img)
+                })
+                enemy3[0].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy3Img[0].push(img)
+                })
+                enemy3[1].forEach(ele => {
+                    const img = new Image()
+                    img.src = ele
+                    enemy3Img[1].push(img)
+                })   
+                const limg = new Image()
+                limg.src = './images/life.png'
+                lifeImg = limg
+                const bimg = new Image()
+                bimg.src = './images/bomb.png'
+                bombImg = bimg
+                const over = new Image()
+                over.src = './images/gameover.png'
+                gameover = over
+                const bomb_s = new Image()
+                bomb_s.src = './images/bomb_supply.png'
+                bomb_supply = bomb_s
+                const bullet_s = new Image()
+                bullet_s.src = './images/bullet_supply.png'
+                bullet_supply = bullet_s
+                const bullet1 = new Image()
+                bullet1.src = './images/bullet1.png'
+                bullet1Img = bullet1
+                const bullet2 = new Image()
+                bullet2.src = './images/bullet2.png'
+                bullet2Img = bullet2
+                const bgimg1 = new Image()
+                bgimg1.src = './images/background.png'
+                bgimg = bgimg1
+                const againImg = new Image()
+                againImg.src = './images/again.png'
+                again = againImg
+            }
+            await load()
+
+            // 不同类型的敌人数量
+            let small = 10
+            let middle = 2
+            let big = 0
+            // 礼物数量
+            let giftnum = 1
+            // 关卡等级
+            let level = 1
+            // 是否继续
+            let isAgain = false
+            // 是否游戏结束
+            let isover = false
+            // 暂停
+            let pause = false
+            // 得分
+            let sorce = 0
+
+            // 飞机类
+            class Plane{
+                constructor(x,y,speed,life,type){
+                    this.x = x
+                    this.y = y
+                    this.speed = speed
+                    this.life = life
+                    this.img = []
+                    this.destroy = []
+                    this.type = type
+                    // this.init()
+                }
+                
+                move(direct){
+                    // 102 + 126
+                    if(direct === 1){
+                        this.x += this.speed
+                        if(this.x >= 378) this.x = 378
+                    }
+                    if(direct === 2){
+                        this.x -= this.speed
+                        if(this.x <= 0) this.x = 0
+                    }
+                    if(direct === 3){
+                        this.y += this.speed
+                        if(this.y >= 574) this.y = 574
+                    }
+                    if(direct === 4){
+                        this.y -= this.speed
+                        if(this.y <= 0) this.y = 0
+                    }
+                }
+            }
+            // 玩家
+            class Hero extends Plane{
+                constructor(x,y,speed,life){
+                    super(x,y,speed,life,0)
+                    this.index = 0
+                    this.imgi = 16
+                    this.bomb = 1
+                    this.bombImg = bombImg
+                    this.lifeImg = lifeImg
+                    this.bullets = []
+                    this.islife = true
+                    this.strongbullet = 0
+                    this.ispower = false
+                    this.init()
+                }
+                init(){
+                    this.img = heroImg[0]
+                    this.destroy = heroImg[1]
+                }
+                shoot(){
+                    if(this.strongbullet > 0){
+                        this.strongbullet -= 2
+                        if(this.bullets.length > 1){
+                            if(this.bullets[this.bullets.length - 1].length <= 594){
+                                const one = new Bullet(this.x + 17,this.y+96,1)
+                                const two = new Bullet(this.x + 81,this.y+96,1)
+                                this.bullets.push(one)
+                                this.bullets.push(two)
+                            }
+                            return
+                        }
+                        const one = new Bullet(this.x + 17,this.y+96,1)
+                        const two = new Bullet(this.x + 81,this.y+96,1)
+                        this.bullets.push(one)
+                        this.bullets.push(two)
+                    }else{
+                        if(this.bullets.length > 1){
+                            if(this.bullets[this.bullets.length - 1].length <= 594){
+                                const one = new Bullet(this.x + 51,this.y+96,0)
+                                this.bullets.push(one)
+                            }
+                            return
+                        }
+                        const one = new Bullet(this.x + 51,this.y+96,0)
+                        this.bullets.push(one)
+                    }
+                
+                }
+            }
+            // 子弹类
+            class Bullet{
+                constructor(x,y,type){
+                    this.x = x
+                    this.y = y
+                    this.speed = 3
+                    this.length = 660
+                    this.img = void 0
+                    this.islife = true
+                    this.type = type
+                    this.init()
+                }
+                init(){
+                    if(this.type === 0){
+                        this.img = bullet1Img
+                    }
+                    if(this.type === 1){
+                        this.img = bullet2Img
+                    }
+                }
+                move(){
+                    this.y -= this.speed
+                    this.length -= this.speed
+                    if(this.length <= 0) this.islife = false
+                }
+            }
+            // 敌人类
+            class Enemy extends Plane{
+                constructor(x,y,speed,life,ontype){
+                    super(x,y,speed,life,1)
+                    this.index = 0
+                    this.imgi = 16
+                    this.isdestroy = void 0
+                    this.ontype = ontype
+                    this.init()
+                }
+                init(){
+                    if(this.ontype === 1){
+                        this.sorce = 1
+                        this.img = enemy1Img[0]
+                        this.destroy = enemy1Img[1]
+                        this.isdestroy = 4
+                    }
+                    if(this.ontype === 2){
+                        this.sorce = 3
+                        this.img = enemy2Img[0]
+                        this.destroy = enemy2Img[1]
+                        this.isdestroy = 4
+                    }
+                    if(this.ontype === 3){
+                        this.sorce = 6
+                        this.img = enemy3Img[0]
+                        this.destroy = enemy3Img[1]
+                        this.isdestroy = 6
+                    } 
+                }
+                move(){
+                    this.y += this.speed
+                    if(this.ontype === 1){
+                        this.life = this.y >= 743 ? 0 : this.life
+                    }
+                    if(this.ontype === 2){
+                        this.life = this.y >= 788 ? 0 : this.life
+                    }
+                    if(this.ontype === 3){
+                        this.life = this.y >= 949 ? 0 : this.life
+                    } 
+                    check(this)
+                }
+            }
+            // 礼物类
+            class Gift{
+                constructor(x,y,speed,type){
+                    // 60 107
+                    this.x = x
+                    this.y = y
+                    this.xspeed = speed 
+                    this.yspeed = speed / 4 * 3
+                    this.type = type
+                    this.img = void 0
+                    this.islife = true
+                    this.init()
+                }
+                init(){
+                    if(this.type === 0){
+                        this.img = bomb_supply
+                    }
+                    if(this.type === 1){
+                        // 58 88
+                        this.img = bullet_supply
+                    }
+                }
+                move(){
+                    let x = this.x + this.xspeed
+                    let y = this.y + this.yspeed
+                    if(x <= -40) {
+                        x = -40 
+                        this.xspeed = -this.xspeed
+                    }
+                    if(x >= 490) {
+                        x = 490 
+                        this.xspeed = -this.xspeed
+                    }
+                    this.x = x
+                    this.y = y
+                    if(this.type === 1){
+                        if(y >= 788) this.islife = false
+                        if(rectCheck(hero.x+5,hero.y+3,92,120,this.x,this.y,58,88)){
+                            this.islife = false
+                            hero.strongbullet += 40
+                        }
+                    }
+                    if(this.type === 0){
+                        if(y >= 807) this.islife = false
+                        if(rectCheck(hero.x+5,hero.y+3,92,120,this.x,this.y,60,107)){
+                            this.islife = false
+                            hero.bomb++
+                            if(hero.bomb >= 3){
+                                hero.bomb = 3
+                            }
+                        }
+                    }
+                }
+            }
+               
+            // 碰撞检测
+            function rectCheck(x1,y1,width1,height1,x2,y2,width2,height2){
+                return x1 <= x2 + width2 &&
+                    x1 + width1 >= x2 &&
+                    y1 <= y2 + height2 &&
+                    y1 + height1 >= y2
+            }
+
+            function check(obj){
+                hero.bullets.forEach(ele => {
+                    // const maxX = ele.x + 5
+                    // const maxY = ele.y + 11 
+                    if(obj.ontype === 1){
+                        // 57 43
+                        if(rectCheck(ele.x,ele.y,5,11,obj.x+6,obj.y+5,47,33)){    
+                           obj.life--
+                           ele.islife = false
+                        }
+                    }
+                    if(obj.ontype === 2){
+                        // 69 88
+                        if(rectCheck(ele.x,ele.y,5,11,obj.x+1,obj.y+5,67,74)){
+                           obj.life--
+                           ele.islife = false
+                        }
+                    }
+                    if(obj.ontype === 3){
+                        // 165 249
+                        if(rectCheck(ele.x,ele.y,5,11,obj.x+4,obj.y+2,157,228)){      
+                           obj.life--
+                           ele.islife = false
+                        }
+                    }
+                })  
+                if(obj.ontype === 1){
+                    // 57 43
+                    if(rectCheck(hero.x+5,hero.y+3,92,120,obj.x+6,obj.y+5,45,33)){
+                        obj.life--
+                        if(!hero.ispower) {
+                            hero.life--
+                            hero.islife = false
+                            hero.ispower = true
+                            hero.index = 0 
+                        }
+                    }
+                }
+                if(obj.ontype === 2){
+                    // 69 88
+                    if(rectCheck(hero.x+5,hero.y+3,92,120,obj.x+1,obj.y+5,67,74)){
+                        obj.life--
+                        if(!hero.ispower) {
+                            hero.life--
+                            hero.islife = false
+                            hero.ispower = true
+                            hero.index = 0 
+                        }
+                    }
+                }
+                if(obj.ontype === 3){
+                    // 165 249
+                    if(rectCheck(hero.x+5,hero.y+3,92,120,obj.x+4,obj.y+2,157,228)){
+                        obj.life--
+                        if(!hero.ispower) {
+                            hero.life--
+                            hero.islife = false
+                            hero.ispower = true
+                            hero.index = 0 
+                        }
+                    }
+                }
+                if(obj.life <= 0){
+                    sorce += obj.sorce
+                    destroyEnemy.push(obj)
+                }
+                if(hero.life <= 0){
+                    isover = true
+                }
+            }
+
+            // 炸弹清空
+            function clearEmemy(){
+                if(hero.bomb <= 0) return
+                hero.bomb--
+                enemy = enemy.filter(ele => {
+                    if(ele.ontype === 1){
+                        // 57 43
+                        if(ele.y >= -43){    
+                            ele.life = 0
+                            sorce += ele.sorce
+                        }
+                    }
+                    if(ele.ontype === 2){
+                        // 69 88
+                        if(ele.y >= -88){    
+                            ele.life = 0
+                            sorce += ele.sorce
+                        }
+                    }
+                    if(ele.ontype === 3){
+                        // 165 249
+                        if(ele.y >= -249){    
+                            ele.life = 0
+                            sorce += ele.sorce
+                        }
+                    }
+                    (ele.life === 0) && destroyEnemy.push(ele)
+                    return ele.life > 0
+                })
+            
+            }
+
+            function reset(){
+                draw()
+            }
+            
+            // 生成玩家
+            let hero = new Hero(240-51,350-64,5,3)
+            // 礼物列表
+            let gifts = []
+            function createGift(){
+                const n = random(0,giftnum)
+                for(let i = 0; i < n; i++){
+                    const type = random(0,1)
+                    const x = random(-40,490)
+                    const y = random(-200,-700)
+                    const gift = new Gift(x,y,1.2,type)
+                    gifts.push(gift)
+                }
+            }
+            createGift()
+            let enemy = []
+            let destroyEnemy = []
+            // 生成敌人
+            function createEnemy(){
+                for(let i = 0; i < small; i++){
+                    const x = random(0,423)
+                    const y = random(-100,-700)
+                    const enemy1Obj = new Enemy(x,y,1,1,1)
+                    enemy.push(enemy1Obj)
+                }
+                for(let i = 0; i < middle; i++){
+                    const x = random(0,411)
+                    const y = random(-200,-600)
+                    const enemy1Obj = new Enemy(x,y,0.6,3,2)
+                    enemy.push(enemy1Obj)
+                }
+                for(let i = 0; i < big; i++){
+                    const x = random(0,411)
+                    const y = random(-200,-800)
+                    const enemy1Obj = new Enemy(x,y,0.3,12,3)
+                    enemy.push(enemy1Obj)
+                }
+            }
+            createEnemy()
+            
+            window.addEventListener('keydown',e => {
+                if(!hero.islife) return
+                // if(e.key === 'ArrowUp') hero.move(4)
+                // if(e.key === 'ArrowDown') hero.move(3)
+                // if(e.key === 'ArrowLeft') hero.move(2)
+                // if(e.key === 'ArrowRight') hero.move(1)
+                if(e.key === ' ') clearEmemy()
+            })
+
+            bg.addEventListener('mousemove', e => {
+                // console.log(e.offsetX,e.clientX)
+                if(!hero.islife) return
+                let x = e.offsetX - 51
+                let y = e.offsetY - 63
+                if(x >= 378) x = 378
+                if(x <= 0)  x = 0
+                if(y >= 574) y = 574
+                if(y <= 0)  y = 0
+                hero.x = x
+                hero.y = y
+            })
+            // 点击发射子弹
+            bg.addEventListener('click',e => {
+                if(!hero.islife) {
+                    if(e.offsetX >= 90 && e.offsetX <= 390 && e.offsetY >= 330 && e.offsetY <= 371){
+                        if(!isAgain){
+                            isAgain = true
+                        }else{
+                            isAgain = false
+                            isover = false
+                            hero = new Hero(240-51,350-64,5,3)
+                            sorce = 0
+                            level = 0
+                            // 不同类型的敌人数量
+                            small = 10
+                            middle = 2
+                            big = 0
+                            // 礼物数量
+                            giftnum = 1
+                            // 关卡等级
+                            level = 1
+                            // 是否继续
+                            isAgain = false
+                            // 是否游戏结束
+                            isover = false
+                            // 暂停
+                            pause = false
+                            // 得分
+                            sorce = 0
+                            destroyEnemy = []
+                            enemy = []
+                            gifts = []
+                        }
+                    }
+                    return
+                }
+                hero.shoot()
+            })
+
+            function draw(){
+                if(isover) {
+                    bgpen.save()
+                    if(isAgain){
+                        bgpen.drawImage(again,90,330)
+                    }else{
+                        bgpen.drawImage(gameover,90,330)
+                    }
+                    bgpen.restore()
+                    return window.requestAnimationFrame(draw)
+                }
+                // 升级关卡
+                if(enemy.length <= 1){
+                    if(sorce >= 12 * level + 6*(level - 1)){
+                        level++
+                        small += 3
+                        middle += 1
+                        if(level % 2 === 0){
+                            giftnum++
+                        }
+                        if(level > 3){
+                            big++
+                        }
+                    }
+                    createEnemy()
+                    createGift()
+                }
+                // 背景
+                bgpen.clearRect(0,0,480,700)
+                bgpen.save()
+                bgpen.drawImage(bgimg,0,0,480,700)
+                bgpen.restore()
+                // 得分
+                bgpen.save()
+                bgpen.font = '20px Microsoft YaHei'
+                // bgpen.strokeStyle = '#ff0000'
+                bgpen.textBaseline = 'middle'
+                const text = bgpen.measureText(`得分:${sorce}`)
+                bgpen.strokeText(`得分:${sorce}`,470-text.width,25)
+                bgpen.restore()
+
+                
+                // 敌人
+                enemy = enemy.filter(ele => {
+                    bgpen.save()
+                    bgpen.drawImage(ele.img[ele.index],ele.x,ele.y)
+                    bgpen.restore()
+                    ele.move()
+                    return ele.life > 0
+                })
+
+                // 绘画敌人爆炸
+                destroyEnemy = destroyEnemy.filter(ele => {
+                    bgpen.save()
+                    bgpen.drawImage(ele.destroy[ele.index],ele.x,ele.y)
+                    ele.imgi--
+                    if(ele.imgi <= 0){
+                        ele.imgi = 16
+                        ele.isdestroy--
+                        ele.index = (ele.index + 1) % ele.destroy.length
+                    }
+                    bgpen.restore()
+                    return ele.isdestroy > 0
+                })
+
+                // 礼物
+                gifts = gifts.filter(ele => {
+                    bgpen.save()
+                    bgpen.drawImage(ele.img,ele.x,ele.y)
+                    bgpen.restore()
+                    ele.move()
+                    return ele.islife
+                })
+
+                // 子弹
+                hero.bullets = hero.bullets.filter(ele => {
+                    bgpen.save()
+                    bgpen.drawImage(ele.img,ele.x,ele.y)
+                    bgpen.restore()
+                    ele.move()
+                    return ele.islife
+                })
+                // bgpen.globalCompositeOperation = 'lighter'   //'lighten'
+                
+                for(let i = 1; i <= hero.life; i ++){
+                    bgpen.save()
+                    bgpen.drawImage(hero.lifeImg,480-(46*i),643)
+                    bgpen.restore()
+                }
+
+                for(let i = 0; i < hero.bomb; i ++){
+                    bgpen.save()
+                    bgpen.drawImage(hero.bombImg,63*i,643)
+                    bgpen.restore()
+                }
+
+                // 玩家
+                bgpen.save()
+                if(hero.islife){
+                    bgpen.drawImage(hero.img[hero.index],hero.x,hero.y)
+                    hero.imgi--
+                    if(hero.imgi <= 0){
+                        hero.imgi = 16
+                        hero.index = (hero.index + 1) % hero.img.length
+                    }
+                }else{
+                    bgpen.drawImage(hero.destroy[hero.index],hero.x,hero.y)
+                    hero.imgi--
+                    if(hero.imgi <= 0){
+                        hero.imgi = 32
+                        hero.index++
+                        if(hero.index >= hero.destroy.length){
+                            hero.index = 0
+                            hero.islife = true
+                            setTimeout(() => {
+                                hero.ispower = false
+                            },1000)
+                        }
+                    }
+                }
+                bgpen.restore()
+
+                window.requestAnimationFrame(draw)
+            }
+
+            function random(min,max){
+                return Math.floor(Math.random()*(max - min + 1) + min)
+            }
+            document.body.append(bg)
+            window.addEventListener('load',draw)
+        })()
+    </script>
+</body>
+</html>
